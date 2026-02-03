@@ -164,7 +164,8 @@ class Interface:
         self._configure_wireguard()
         for peer in self.peers:
             peer.setup(self, self.base_netns)
-        self._assign_namespace(namespace.name)
+        if namespace.name:
+            self._assign_namespace(namespace.name)
         self._assign_addresses(namespace.name)
         self._bring_up(namespace.name)
         self._create_routes(namespace.name)
@@ -180,7 +181,7 @@ class Interface:
             wg('set', self.name, 'private-key', '/dev/stdin', stdin=self.private_key, netns=self.base_netns)
 
     def _assign_namespace(self, namespace: str|None) -> None:
-        ip('link', 'set', self.name, 'netns', namespace if namespace else '1', netns=self.base_netns)
+        ip('link', 'set', self.name, 'netns', namespace, netns=self.base_netns)
 
     def _assign_addresses(self, namespace: str|None) -> None:
         for address in self.address:
